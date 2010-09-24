@@ -1,4 +1,4 @@
-# Autoconf script for freedom-cas
+# Autoconf script for dynacase-cas
 #
 # @author Anakeen
 # @license http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License
@@ -14,7 +14,7 @@ VERSION=`cat VERSION`
 AC_SUBST(RELEASE)
 RELEASE=`cat RELEASE`
 AC_SUBST(PACKAGE)
-PACKAGE=freedom-cas
+PACKAGE=dynacase-cas
 AC_SUBST(APPNAME)
 APPNAME=CAS
 
