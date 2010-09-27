@@ -19,11 +19,13 @@
   <pre-install>
     <check type="syscommand" command="gunzip" />
     <check type="syscommand" command="tar" />
+    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
   </pre-install>
   
   <pre-upgrade>
     <check type="syscommand" command="gunzip" />
     <check type="syscommand" command="tar" />
+    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
   </pre-upgrade>
 
   <post-install>
