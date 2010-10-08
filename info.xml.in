@@ -1,24 +1,31 @@
 <?xml version="1.0"?>
-<module name="freedom-cas" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.freedom-ecm.org/modules/freedom-cas/freedom-cas">
+<module name="dynacase-cas" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas">
 
-  <description lang="en">CAS (Central Authentication Service) support for Freedom</description>
+  <description lang="en">CAS (Central Authentication Service) support for Dynacase</description>
+
+  <replaces>
+        <module name="freedom-cas" />
+  </replaces>
 
   <requires>
-    <module name="freedom-networkuser" />
+    <module name="dynacase-networkuser" />
+    <module name="dynacase-platform" />
   </requires>
 
   <parameters>
-    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.freedom-ecm.org/third-party/CAS-1.0.1.tgz" />
+    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.0.1.tgz" />
   </parameters>
 
   <pre-install>
     <check type="syscommand" command="gunzip" />
     <check type="syscommand" command="tar" />
+    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
   </pre-install>
   
   <pre-upgrade>
     <check type="syscommand" command="gunzip" />
     <check type="syscommand" command="tar" />
+    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
   </pre-upgrade>
 
   <post-install>
