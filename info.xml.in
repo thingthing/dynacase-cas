@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<module name="dynacase-cas" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas">
+<module name="dynacase-cas" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas" license="@LICENSE@">
 
   <description lang="en">CAS (Central Authentication Service) support for Dynacase</description>
 
@@ -8,12 +8,13 @@
   </replaces>
 
   <requires>
+    <installer comp="ge" version="1.1.0" />
     <module name="dynacase-networkuser" />
-    <module name="dynacase-platform" />
+    <module name="dynacase-platform" comp="ge" version="3.0.18" />
   </requires>
 
   <parameters>
-    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.0.1.tgz" />
+    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.0.1.tgz" volatile="yes" oninstall="W" onupgrade="W" onedit="H" />
   </parameters>
 
   <pre-install>
