@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<module name="dynacase-cas" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas" license="@LICENSE@">
+<module name="dynacase-cas-installer" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas" license="@LICENSE@">
 
   <description lang="en">CAS (Central Authentication Service) support for Dynacase</description>
 
   <replaces>
-        <module name="freedom-cas" />
+        <module name="dynacase-cas" />
   </replaces>
 
   <requires>
