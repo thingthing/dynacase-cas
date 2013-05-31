@@ -55,14 +55,14 @@ if( $ret === false ) {
 }
 
 // Unpack archive in tempdir
-$cmd = sprintf('tar -C "%s" -zxf "%s" > "%s" 2>&1', escapeshellcmd($tempdir), escapeshellcmd($phpcas_tgz), escapeshellcmd($tmpfile));
+$cmd = sprintf('tar -C %s -zxf %s > %s 2>&1', escapeshellarg($tempdir), escapeshellarg($phpcas_tgz), escapeshellarg($tmpfile));
 system($cmd, $ret);
 
 $output = file_get_contents($tmpfile);
 @unlink($tmpfile);
 
 if( $ret !== 0 ) {
-  print sprintf('Error tar -C "%s" -zcf "%s"\n', $tempdir, escapeshellcmd($phpcas_tgz));
+  print sprintf('Error tar -C %s -zcf %s\n', $tempdir, escapeshellarg($phpcas_tgz));
   exit(1);
 }
 
@@ -95,7 +95,7 @@ if( ! is_dir('CAS') ) {
 }
 
 // Copy new phpCAS files over existing CAS directory
-$cmd = sprintf('tar -C "%s/%s" --exclude docs -cf - . | tar -C "%s" -xf -', escapeshellcmd($tempdir), escapeshellcmd($phpcas_subdir), "CAS");
+$cmd = sprintf('tar -C %s/%s --exclude docs -cf - . | tar -C %s -xf -', escapeshellarg($tempdir), escapeshellarg($phpcas_subdir), "CAS");
 system($cmd, $ret);
 
 if( $ret !== 0 ) {
@@ -104,7 +104,7 @@ if( $ret !== 0 ) {
 }
 
 // Cleanup tempdir
-$cmd = sprintf('rm -Rf "%s"', escapeshellcmd($tempdir));
+$cmd = sprintf('rm -Rf %s', escapeshellarg($tempdir));
 system($cmd, $ret);
 
 exit(0);
