@@ -93,7 +93,7 @@ Class casAuthenticator extends Authenticator
      **
      *
      */
-    public function askAuthentication()
+    public function askAuthentication($args)
     {
         include_once ("CAS/CAS.php");
         
@@ -143,7 +143,7 @@ Class casAuthenticator extends Authenticator
      **
      *
      */
-    public function logout($redir_uri)
+    public function logout($redir_uri = '')
     {
         include_once ("CAS/CAS.php");
         
