@@ -28,22 +28,7 @@ Class casAuthenticator extends Authenticator
         
         if ($session->read('username') != "") return Authenticator::AUTH_OK;
         
-        $cas_version = $this->parms['cas_version'];
-        $cas_server = $this->parms['cas_server'];
-        $cas_port = $this->parms['cas_port'];
-        $cas_uri = $this->parms['cas_uri'];
-        
-        if ($cas_version == 'CAS_VERSION_2_0') {
-            $cas_version = CAS_VERSION_2_0;
-        } elseif ($cas_version == 'CAS_VERSION_1_0') {
-            $cas_version = CAS_VERSION_1_0;
-        }
-        
-        if (!is_object($PHPCAS_CLIENT)) {
-            phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
+        $this->setupCasClient();
         
         if (!phpCAS::isAuthenticated()) {
             phpCAS::forceAuthentication();
@@ -61,6 +46,43 @@ Class casAuthenticator extends Authenticator
         error_log(__CLASS__ . "::" . __FUNCTION__ . " " . sprintf("CAS login (user='%s', service='%s')", phpCAS::getUser() , phpCAS::getServiceURL()));
         
         return Authenticator::AUTH_OK;
+    }
+    /**
+     * Setup global phpCas client
+     */
+    public function setupCasClient()
+    {
+        $cas_version = $this->parms['cas_version'];
+        $cas_server = $this->parms['cas_server'];
+        $cas_port = $this->parms['cas_port'];
+        $cas_uri = $this->parms['cas_uri'];
+        $cas_debug = $this->parms['cas_debug'];
+        $cas_sslversion = $this->parms['cas_sslversion'];
+        $cas_servercert = $this->parms['cas_servercert'];
+        $cas_servercacert = $this->parms['cas_servercacert'];
+        
+        if ($cas_version == 'CAS_VERSION_2_0') {
+            $cas_version = CAS_VERSION_2_0;
+        } elseif ($cas_version == 'CAS_VERSION_1_0') {
+            $cas_version = CAS_VERSION_1_0;
+        }
+        
+        if (!is_object($PHPCAS_CLIENT)) {
+            if ($cas_debug == 'yes') {
+                phpCAS::setDebug();
+            }
+            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
+        }
+        if ($cas_sslversion == 2 || $cas_sslversion == 3) {
+            phpCas::setExtraCurlOption(CURLOPT_SSLVERSION, $cas_sslversion);
+        }
+        if ($cas_servercert != '') {
+            phpCAS::setCasServerCert($cas_servercert);
+        } else if ($cas_servercacert != '') {
+            phpCAS::setCasServerCACert($cas_servercacert);
+        } else {
+            phpCAS::setNoCasServerValidation();
+        }
     }
     /**
      * retrieve authentification session
@@ -97,23 +119,7 @@ Class casAuthenticator extends Authenticator
     {
         include_once ("CAS/CAS.php");
         
-        $cas_version = $this->parms['cas_version'];
-        $cas_server = $this->parms['cas_server'];
-        $cas_port = $this->parms['cas_port'];
-        $cas_uri = $this->parms['cas_uri'];
-        
-        if ($cas_version == 'CAS_VERSION_2_0') {
-            $cas_version = CAS_VERSION_2_0;
-        } elseif ($cas_version == 'CAS_VERSION_1_0') {
-            $cas_version = CAS_VERSION_1_0;
-        }
-        
-        if (!is_object($PHPCAS_CLIENT)) {
-            phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
-        
+        $this->setupCasClient();
         phpCAS::forceAuthentication();
         
         return FALSE;
@@ -147,23 +153,6 @@ Class casAuthenticator extends Authenticator
     {
         include_once ("CAS/CAS.php");
         
-        $cas_version = $this->parms['cas_version'];
-        $cas_server = $this->parms['cas_server'];
-        $cas_port = $this->parms['cas_port'];
-        $cas_uri = $this->parms['cas_uri'];
-        
-        if ($cas_version == 'CAS_VERSION_2_0') {
-            $cas_version = CAS_VERSION_2_0;
-        } elseif ($cas_version == 'CAS_VERSION_1_0') {
-            $cas_version = CAS_VERSION_1_0;
-        }
-        
-        if (!is_object($PHPCAS_CLIENT)) {
-            phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
-        
         $session = $this->getAuthSession();
         $service = $session->read('service');
         
@@ -171,6 +160,7 @@ Class casAuthenticator extends Authenticator
         
         $session->register('username', '');
         
+        $this->setupCasClient();
         phpCAS::logoutWithRedirectServiceAndUrl($service, $service);
     }
     /**
