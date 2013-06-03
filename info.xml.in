@@ -10,11 +10,11 @@
   <requires>
     <installer comp="ge" version="1.1.0" />
     <module name="dynacase-networkuser" />
-    <module name="dynacase-platform" comp="ge" version="3.0.18" />
+    <module name="dynacase-platform" comp="lt" version="3.2.0" />
   </requires>
 
   <parameters>
-    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.0.1.tgz" volatile="yes" oninstall="W" onupgrade="W" onedit="H" />
+    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.3.2.tgz" volatile="yes" oninstall="W" onupgrade="W" onedit="H" />
   </parameters>
 
   <pre-install>

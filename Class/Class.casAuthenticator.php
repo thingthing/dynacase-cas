@@ -10,28 +10,63 @@
 */
 
 include_once ('WHAT/Class.Authenticator.php');
+include_once ('CAS/CAS.php');
 
 Class casAuthenticator extends Authenticator
 {
     
     public $auth_session = null;
+
     /**
-     **
-     **
-     *
+     * @throws Exception
+     * @return int
      */
     public function checkAuthentication()
     {
-        include_once ("CAS/CAS.php");
-        
         $session = $this->getAuthSession();
         
         if ($session->read('username') != "") return Authenticator::AUTH_OK;
         
+        $this->setupCasClient($session);
+        phpCAS::forceAuthentication();
+        
+        throw new Exception(sprintf("Error: you are not supposed to be here..."));
+    }
+    /**
+     * Post authentication handling
+     *
+     * @param string $ticket
+     * @param Session $session
+     * @throws Exception
+     */
+    public function _cas_postAuthenticate($ticket, $session)
+    {
+        $session->register('username', phpCAS::getUser());
+        $session->register('service', phpCAS::getServiceURL());
+        
+        if (!$this->freedomUserExists(phpCAS::getUser())) {
+            if (!$this->tryInitializeUser(phpCAS::getUser())) {
+                $session->register('username', '');
+                throw new Exception(sprintf("Error creating CAS user '%s'.", phpCAS::getUser()));
+            }
+        }
+        
+        error_log(__METHOD__ . " " . sprintf("CAS login (user='%s', service='%s')", phpCAS::getUser() , phpCAS::getServiceURL()));
+    }
+    /**
+     * Setup global phpCas client
+     *
+     * @param Session $session
+     */
+    public function setupCasClient($session)
+    {
         $cas_version = $this->parms['cas_version'];
         $cas_server = $this->parms['cas_server'];
         $cas_port = $this->parms['cas_port'];
         $cas_uri = $this->parms['cas_uri'];
+        $cas_debug = $this->parms['cas_debug'];
+        $cas_sslversion = $this->parms['cas_sslversion'];
+        $cas_servercacert = $this->parms['cas_servercacert'];
         
         if ($cas_version == 'CAS_VERSION_2_0') {
             $cas_version = CAS_VERSION_2_0;
@@ -39,28 +74,24 @@ Class casAuthenticator extends Authenticator
             $cas_version = CAS_VERSION_1_0;
         }
         
-        if (!is_object($PHPCAS_CLIENT)) {
+        if ($cas_debug == 'yes') {
             phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
         }
-        phpCAS::setNoCasServerValidation();
-        
-        if (!phpCAS::isAuthenticated()) {
-            phpCAS::forceAuthentication();
+        phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
+        if ($cas_sslversion == 2 || $cas_sslversion == 3) {
+            phpCas::setExtraCurlOption(CURLOPT_SSLVERSION, $cas_sslversion);
         }
-        
-        $session->register('username', phpCAS::getUser());
-        $session->register('service', phpCAS::getServiceURL());
-        
-        if (!$this->freedomUserExists(phpCAS::getUser())) {
-            if (!$this->tryInitializeUser(phpCAS::getUser())) {
-                return Authenticator::AUTH_NOK;
-            }
+        if ($cas_servercacert != '') {
+            phpCAS::setCasServerCACert($cas_servercacert);
+        } else {
+            phpCAS::setNoCasServerValidation();
         }
-        
-        error_log(__CLASS__ . "::" . __FUNCTION__ . " " . sprintf("CAS login (user='%s', service='%s')", phpCAS::getUser() , phpCAS::getServiceURL()));
-        
-        return Authenticator::AUTH_OK;
+        phpCAS::setPostAuthenticateCallback(array(
+            $this,
+            '_cas_postAuthenticate'
+        ) , array(
+            $session
+        ));
     }
     /**
      * retrieve authentification session
@@ -80,48 +111,23 @@ Class casAuthenticator extends Authenticator
         return $this->auth_session;
     }
     /**
-     **
-     **
-     *
+     * @param $opt
+     * @return bool
      */
     function checkAuthorization($opt)
     {
         return TRUE;
     }
     /**
-     **
-     **
-     *
+     * @param $args
+     * @return bool
      */
-    public function askAuthentication()
+    public function askAuthentication($args)
     {
-        include_once ("CAS/CAS.php");
-        
-        $cas_version = $this->parms['cas_version'];
-        $cas_server = $this->parms['cas_server'];
-        $cas_port = $this->parms['cas_port'];
-        $cas_uri = $this->parms['cas_uri'];
-        
-        if ($cas_version == 'CAS_VERSION_2_0') {
-            $cas_version = CAS_VERSION_2_0;
-        } elseif ($cas_version == 'CAS_VERSION_1_0') {
-            $cas_version = CAS_VERSION_1_0;
-        }
-        
-        if (!is_object($PHPCAS_CLIENT)) {
-            phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
-        
-        phpCAS::forceAuthentication();
-        
         return FALSE;
     }
     /**
-     **
-     **
-     *
+     * @return string
      */
     public function getAuthUser()
     {
@@ -129,9 +135,7 @@ Class casAuthenticator extends Authenticator
         return $session_auth->read('username');
     }
     /**
-     **
-     **
-     *
+     * @return string
      */
     public function getAuthPw()
     {
@@ -139,44 +143,24 @@ Class casAuthenticator extends Authenticator
         return $session_auth->read('password');
     }
     /**
-     **
-     **
-     *
+     * @param string $redir_uri
      */
-    public function logout($redir_uri)
+    public function logout($redir_uri = '')
     {
-        include_once ("CAS/CAS.php");
-        
-        $cas_version = $this->parms['cas_version'];
-        $cas_server = $this->parms['cas_server'];
-        $cas_port = $this->parms['cas_port'];
-        $cas_uri = $this->parms['cas_uri'];
-        
-        if ($cas_version == 'CAS_VERSION_2_0') {
-            $cas_version = CAS_VERSION_2_0;
-        } elseif ($cas_version == 'CAS_VERSION_1_0') {
-            $cas_version = CAS_VERSION_1_0;
-        }
-        
-        if (!is_object($PHPCAS_CLIENT)) {
-            phpCAS::setDebug();
-            phpCAS::client($cas_version, $cas_server, $cas_port, $cas_uri, false);
-        }
-        phpCAS::setNoCasServerValidation();
-        
         $session = $this->getAuthSession();
         $service = $session->read('service');
         
-        error_log(__CLASS__ . "::" . __FUNCTION__ . " " . sprintf("CAS logout (service='%s', redirect='%')", $service, $redir_uri));
+        error_log(__CLASS__ . "::" . __FUNCTION__ . " " . sprintf("CAS logout (service='%s', redirect='%s')", $service, $redir_uri));
         
         $session->register('username', '');
         
-        phpCAS::logoutWithRedirectServiceAndUrl($service, $service);
+        $this->setupCasClient($session);
+        phpCAS::logoutWithRedirectService($service);
     }
     /**
-     **
-     **
-     *
+     * @param $name
+     * @param $value
+     * @return string
      */
     public function setSessionVar($name, $value)
     {
@@ -186,9 +170,8 @@ Class casAuthenticator extends Authenticator
         return $session_auth->read($name);
     }
     /**
-     **
-     **
-     *
+     * @param $name
+     * @return string
      */
     public function getSessionVar($name)
     {
@@ -196,4 +179,3 @@ Class casAuthenticator extends Authenticator
         return $session_auth->read($name);
     }
 }
-?>
