@@ -1,11 +1,14 @@
+appname = WHAT
+export appname
+
 include $(utildir)/PubRule
 
-pages_fdl = $(patsubst %.php,$(pubdir)/$(applib)/%.php,$(wildcard Class*.php))
+classes = $(patsubst %.php,$(pubdir)/$(applib)/%.php,$(wildcard Class*.php))
 
 $(pubdir)/$(applib):
 	mkdir -p $@
 
 $(pubdir)/$(applib)/%.php: %.php $(pubdir)/$(applib)
-	ln -s ../$(appname)/$< $@
+	cp $< $@
 
-publish: $(pubdir)/$(applib) $(pages_fdl)
+publish: $(classes)

@@ -10,7 +10,7 @@
 */
 
 include_once ('WHAT/Class.Authenticator.php');
-include_once ('CAS/CAS.php');
+include_once ('lib/CAS/CAS.php');
 
 Class casAuthenticator extends Authenticator
 {

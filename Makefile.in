@@ -1,12 +1,11 @@
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 utildir = @PUBRULE@
-appname = @APPNAME@
 pubdir = @prefix@
 srcdir = @srcdir@
 applib = WHAT
 
-export pubdir utildir appname applib
+export pubdir utildir applib
 
 TAR = gtar
 GZIP_ENV = --best
@@ -23,16 +22,3 @@ include $(utildir)/PubRule
 DISTFILES += $(SUBDIR) \
             RELEASE VERSION 
 
-$(pubdir)/$(appname): $(pubdir)
-	mkdir -p $(pubdir)/$(appname)
-
-$(pubdir)/$(appname)/.htaccess: htaccess $(pubdir)/$(appname)
-	cp $< $@
-
-$(pubdir)/programs: $(pubdir)
-	mkdir -p $(pubdir)/programs
-
-$(pubdir)/programs/phpcas_install: programs/phpcas_install $(pubdir)/programs
-	cp $< $@
-
-publish: $(pubdir)/$(appname)/.htaccess $(pubdir)/programs/phpcas_install

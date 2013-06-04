@@ -14,9 +14,7 @@ VERSION=`cat VERSION`
 AC_SUBST(RELEASE)
 RELEASE=`cat RELEASE`
 AC_SUBST(PACKAGE)
-PACKAGE=dynacase-cas-installer
-AC_SUBST(APPNAME)
-APPNAME=CAS
+PACKAGE=dynacase-cas
 
 LICENSE="http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License"
 AC_SUBST(LICENSE)

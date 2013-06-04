@@ -1,49 +1,15 @@
 <?xml version="1.0"?>
-<module name="dynacase-cas-installer" disabled="no" version="@VERSION@" release="@RELEASE@" infopath="http://www.dynacase.org/modules/dynacase-cas/dynacase-cas" license="@LICENSE@">
+<module name="dynacase-cas" disabled="no" version="@VERSION@" release="@RELEASE@" license="@LICENSE@">
 
-  <description lang="en">CAS (Central Authentication Service) support for Dynacase</description>
+  <description lang="en">CAS (Central Authentication Service) authenticator class for Dynacase</description>
 
   <replaces>
-        <module name="dynacase-cas" />
+        <module name="dynacase-cas-installer" />
   </replaces>
 
   <requires>
     <installer comp="ge" version="1.1.0" />
-    <module name="dynacase-networkuser" />
-    <module name="dynacase-platform" comp="lt" version="3.2.0" />
+    <module name="dynacase-phpcas-installer" comp="eq" version="1.3.2" />
   </requires>
-
-  <parameters>
-    <param name="phpcas_url" label="phpCAS download URL" type="text" default="http://ftp.dynacase.org/third-party/CAS-1.3.2.tgz" volatile="yes" oninstall="W" onupgrade="W" onedit="H" />
-  </parameters>
-
-  <pre-install>
-    <check type="syscommand" command="gunzip" />
-    <check type="syscommand" command="tar" />
-    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
-  </pre-install>
-  
-  <pre-upgrade>
-    <check type="syscommand" command="gunzip" />
-    <check type="syscommand" command="tar" />
-    <check type="phpfunction" function="curl_exec"><help>You might need to install a php-curl package in order to install CAS module.</help></check>
-  </pre-upgrade>
-
-  <post-install>
-    <download href="@phpcas_url" action="programs/phpcas_install"><label lang="en">Download and install phpCAS</label></download>
-  </post-install>
-  
-  <post-upgrade>
-    <download href="@phpcas_url" action="programs/phpcas_install"><label lang="en">Download and install phpCAS</label></download>
-  </post-upgrade>
-
-  <changelog>
-    <version number="0.0.2-1" date="2010-03-30">
-      <change title="Added support for downloading phpCAS source from third-party repo." />
-    </version>
-    <version number="0.0.1-1" date="2010-03-25">
-      <change title="Initial release" />
-    </version>
-  </changelog>
 
 </module>
